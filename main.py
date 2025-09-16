@@ -14,7 +14,6 @@ def get_total_pokemon():
     else:
         return 1010  # fallback
 
-
 def get_pokemon_data(name_or_id):
     """Fetch Pokémon data from the PokéAPI."""
     url = f"{POKEAPI_BASE_URL}{name_or_id}"
@@ -31,12 +30,44 @@ def get_pokemon_data(name_or_id):
 
 def display_pokemon_info(data):
     """Display Pokémon info in a clean format using Rich tables."""
+
+    # Define emoji mapping for Pokémon types
+    type_emojis = {
+        "normal": "😺",
+        "fire": "🔥",
+        "water": "💧",
+        "electric": "⚡",
+        "grass": "🌱",
+        "ice": "❄️",
+        "fighting": "🥊",
+        "poison": "☠️",
+        "ground": "🌍",
+        "flying": "🕊️",
+        "psychic": "🔮",
+        "bug": "🐛",
+        "rock": "🪨",
+        "ghost": "👻",
+        "dragon": "🐉",
+        "dark": "🌑",
+        "steel": "⚙️",
+        "fairy": "🧚",
+    }
+
     name = data["name"].capitalize()
     poke_id = data["id"]
-    types = ", ".join([t["type"]["name"].capitalize() for t in data["types"]])
+
+    # Build type string with emojis
+    type_list = []
+    for t in data["types"]:
+        type_name = t["type"]["name"]
+        emoji = type_emojis.get(type_name, "❓")
+        type_list.append(f"{emoji} {type_name.capitalize()}")
+
+    types = ", ".join(type_list)
+    
     sprite = data["sprites"]["front_default"]
 
-    console.print(f"\n:zap: [bold yellow]{name}[/bold yellow] (#{poke_id})")
+    console.print(f"\n[bold yellow]{name}[/bold yellow] (#{poke_id})")
     console.print(f"[bold]Type(s):[/bold] {types}")
     console.print(f"[bold]Sprite:[/bold] {sprite}\n")
 
