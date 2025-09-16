@@ -1,8 +1,8 @@
-# Pokédex: Project Documentation
+# PokéCLI: Project Documentation
 Explore, discover, and get stats on any Pokémon instantly. 
 
 ## 🌍 Project overview
-Introducing my **Pokédex!** A Python-based command-line Pokédex that lets users look up Pokémon stats, types, and evolution chains, with support for random Pokémon discovery.  
+Introducing my **PokéCLI!** A Python-based command-line Pokédex clone that lets users look up Pokémon stats, types, and evolution chains, with support for random Pokémon discovery.  
 ‍
 - 🎯 **The goal:** Create a Python API-powered mini app
 - 🛠 **Tech-stack:** Python 3.13
