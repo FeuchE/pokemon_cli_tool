@@ -29,21 +29,48 @@ def get_pokemon_data(name_or_id):
         return None
 
 def get_evolution_chain(species_url):
-    """Fetch and return evolution chain as a list of names."""
-    species_data = requests.get(species_url).json()
-    evolution_chain_url = species_data["evolution_chain"]["url"]
-    evolution_data = requests.get(evolution_chain_url).json()
+    """Fetch and return evolution chain as a list of Pokémon names with error handling."""
+    try:
+        response = requests.get(species_url, timeout=5)
+        response.raise_for_status()
+        species_data = response.json()
+    except requests.exceptions.RequestException as e:
+        console.print(f"[bold red]Error:[/bold red] Failed to fetch species data: {e}")
+        return []
 
-    chain = evolution_data["chain"]
+    # Safely get the evolution chain URL
+    evolution_chain_url = species_data.get("evolution_chain", {}).get("url")
+    if not evolution_chain_url:
+        console.print("[bold yellow]No evolution chain found for this Pokémon.[/bold yellow]")
+        return []
+
+    try:
+        evo_response = requests.get(evolution_chain_url, timeout=5)
+        evo_response.raise_for_status()
+        evolution_data = evo_response.json()
+    except requests.exceptions.RequestException as e:
+        console.print(f"[bold red]Error:[/bold red] Failed to fetch evolution chain data: {e}")
+        return []
+
+    chain = evolution_data.get("chain")
+    if not chain:
+        console.print("[bold yellow]No evolution data found in the API response.[/bold yellow]")
+        return []
 
     evolution_list = []
 
+    # Recursive helper function to traverse chain
     def traverse(chain_link):
         evolution_list.append(chain_link["species"]["name"].capitalize())
         for evo in chain_link.get("evolves_to", []):
             traverse(evo)
 
-    traverse(chain)
+    try:
+        traverse(chain)
+    except KeyError as e:
+        console.print(f"[bold red]Error:[/bold red] Malformed evolution data: missing key {e}")
+        return []
+
     return evolution_list
 
 def display_pokemon_info(data):
@@ -90,9 +117,12 @@ def display_pokemon_info(data):
     console.print(f"[bold]Sprite:[/bold] {sprite}\n")
 
     # Fetch and display evolution chain
-    evolution_list = get_evolution_chain(data["species"]["url"])
-    if len(evolution_list) > 1:
-        console.print(f"[bold cyan]Evolution Chain:[/bold cyan] {' → '.join(evolution_list)}\n")
+    try:
+        evolution_list = get_evolution_chain(data["species"]["url"])
+        if len(evolution_list) > 1:
+            console.print(f"[bold cyan]Evolution Chain:[/bold cyan] {' → '.join(evolution_list)}\n")
+    except Exception as e:
+        console.print(f"[bold red]Warning:[/bold red] Could not fetch evolution chain. ({e})\n")
 
     # Display Base Stats
     table = Table(title="Base Stats")
