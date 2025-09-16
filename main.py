@@ -81,13 +81,34 @@ def display_pokemon_info(data):
 
     console.print(table)
 
+def list_pokemon_by_type(type_name):
+    """Fetch and list the first 20 Pokémon of a given type."""
+    url = f"https://pokeapi.co/api/v2/type/{type_name.lower()}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        console.print(f"[bold red]Error:[/bold red] Type '{type_name}' not found.")
+        return
+
+    data = response.json()
+    pokemon_list = data["pokemon"][:20]  # select first 20 Pokémon
+
+    console.print(f"\n[bold green]First 20 Pokémon of type '{type_name.capitalize()}':[/bold green]")
+    for i, entry in enumerate(pokemon_list, start=1):
+        name = entry["pokemon"]["name"].capitalize()
+        console.print(f"{i}. {name}")
+
 def main():
     parser = argparse.ArgumentParser(description="Pokémon Lookup CLI Tool")
     parser.add_argument("pokemon", nargs="?", help="Name of the Pokémon to look up (e.g., pikachu)")
     parser.add_argument("--random", action="store_true", help="Fetch a random Pokémon")
+    parser.add_argument("--type", help="List the first 20 Pokémon of a given type (e.g., fire, water)")
     args = parser.parse_args()
 
-    if args.random:
+    if args.type:
+        list_pokemon_by_type(args.type)
+        return
+    elif args.random:
         # Pick a random Pokémon by ID
         total = get_total_pokemon()
         random_id = random.randint(1, total)
@@ -98,8 +119,9 @@ def main():
         console.print("[bold red]Error:[/bold red] You must provide a Pokémon name or use --random.")
         return
 
-    if data:
-        display_pokemon_info(data)
+    if args.pokemon or args.random:
+        if data:
+            display_pokemon_info(data)
 
 if __name__ == "__main__":
     main()
