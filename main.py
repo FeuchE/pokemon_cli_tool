@@ -28,6 +28,24 @@ def get_pokemon_data(name_or_id):
         console.print(f"[bold red]Error:[/bold red] Could not fetch data. (Status code: {response.status_code})")
         return None
 
+def get_evolution_chain(species_url):
+    """Fetch and return evolution chain as a list of names."""
+    species_data = requests.get(species_url).json()
+    evolution_chain_url = species_data["evolution_chain"]["url"]
+    evolution_data = requests.get(evolution_chain_url).json()
+
+    chain = evolution_data["chain"]
+
+    evolution_list = []
+
+    def traverse(chain_link):
+        evolution_list.append(chain_link["species"]["name"].capitalize())
+        for evo in chain_link.get("evolves_to", []):
+            traverse(evo)
+
+    traverse(chain)
+    return evolution_list
+
 def display_pokemon_info(data):
     """Display Pokémon info in a clean format using Rich tables."""
 
@@ -70,6 +88,11 @@ def display_pokemon_info(data):
     console.print(f"\n[bold yellow]{name}[/bold yellow] (#{poke_id})")
     console.print(f"[bold]Type(s):[/bold] {types}")
     console.print(f"[bold]Sprite:[/bold] {sprite}\n")
+
+    # Fetch and display evolution chain
+    evolution_list = get_evolution_chain(data["species"]["url"])
+    if len(evolution_list) > 1:
+        console.print(f"[bold cyan]Evolution Chain:[/bold cyan] {' → '.join(evolution_list)}\n")
 
     # Display Base Stats
     table = Table(title="Base Stats")
