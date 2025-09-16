@@ -151,6 +151,16 @@ def list_pokemon_by_type(type_name):
         name = entry["pokemon"]["name"].capitalize()
         console.print(f"{i}. {name}")
 
+def get_random_pokemon():
+    response = requests.get("https://pokeapi.co/api/v2/pokemon?limit=2000")
+    if response.status_code == 200:
+        results = response.json()["results"]
+        random_pokemon = random.choice(results)
+        return get_pokemon_data(random_pokemon["name"])
+    else:
+        console.print("[bold red]Error:[/bold red] Could not fetch Pokémon list.")
+        return None
+
 def main():
     parser = argparse.ArgumentParser(description="Pokémon Lookup CLI Tool")
     parser.add_argument("pokemon", nargs="?", help="Name of the Pokémon to look up (e.g., pikachu)")
@@ -162,10 +172,7 @@ def main():
         list_pokemon_by_type(args.type)
         return
     elif args.random:
-        # Pick a random Pokémon by ID
-        total = get_total_pokemon()
-        random_id = random.randint(1, total)
-        data = get_pokemon_data(random_id)
+        data = get_random_pokemon()
     elif args.pokemon:
         data = get_pokemon_data(args.pokemon)
     else:
