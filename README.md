@@ -70,8 +70,8 @@ A new command-line app where you can quickly look-up a Pokémon's stats and evol
 ## 🚧 Error handling
 
 **1. General API related error handling**
-- **Challenge**: To stop my app crashing when encountering edge cases or network failures. For example, if PokéAPI is overloaded, there are API errors, slow responses, or invalid URLs. 
-- **Solution**: I added Try/Except error handling to catches network errors and timeouts. I tested blocks of code for errors in the try blocks. Then handled errors in the except blocks.
+- **Challenge**: To stop my app from crashing when encountering edge cases or network failures. For example, if the PokéAPI is overloaded, it may result in API errors, slow responses, or invalid URLs. 
+- **Solution**: I added Try/Except error handling to catch network errors and timeouts. I tested blocks of code for errors in the try blocks. Then handled errors in the except blocks.
 
 **2. Network Error Handling**
 - **Challenge**: Connection errors, timeouts, and 404/500 responses.
